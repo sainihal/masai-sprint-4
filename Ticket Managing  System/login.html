@@ -1,0 +1,127 @@
+<html>
+
+<head>
+    <title>
+        UserRegistration
+    </title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
+        integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+</head>
+
+<body>
+    <div class="container mt-5 w-25">
+        <form>
+            <div class="form-group">
+                <label for="inputEmail">Email address</label>
+                <input type="email" class="form-control" id="inputEmail" placeholder="temp@tempmail.com"
+                    aria-describedby="emailHelp">
+                <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone
+                    else.</small>
+            </div>
+            <div class="form-group">
+                <label for="inputPassword">Password</label>
+                <input type="password" class="form-control" id="inputPassword">
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio1" value="admin"
+                    checked>
+                <label class="form-check-label" for="inlineRadio1">Admin</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio2" value="user">
+                <label class="form-check-label" for="inlineRadio2">User</label>
+            </div>
+            <small id="emailHelp" class="form-text text-muted">Check how you want to login</small>
+            <button type="submit" class="btn btn-primary d-block mt-3">Submit</button>
+        </form>
+        <div id="validationMsg" class="text-danger"></div>
+    </div>
+    <script>
+        var btn = document.querySelector("button")
+        btn.addEventListener("click", function (e) { processLogin(e) })
+
+        var defaultAdminDetails = { "admin@company.com": "admin" }
+        var defaultUserDetails = { "user@company.com": "user" }
+
+
+        var adminsData = localStorage.getItem("adminsData")
+        var usersData = localStorage.getItem("usersData")
+
+
+        var adminsData = adminsData == undefined ? setAdminsDetails() : JSON.parse(adminsData)
+
+        var usersData = usersData == undefined ? setUsersDetails() : JSON.parse(usersData)
+
+        //sets default admins details
+        function setAdminsDetails() {
+            localStorage.setItem("adminsData", JSON.stringify(defaultAdminDetails))
+            return JSON.parse(localStorage.getItem("adminsData"))
+        }
+        //sets default users details
+        function setUsersDetails() {
+            localStorage.setItem("usersData", JSON.stringify(defaultUserDetails))
+            return JSON.parse(localStorage.getItem("usersData"))
+        }
+
+        //validates the input details
+        //invokes validate function
+        function processLogin(e) {
+            e.preventDefault();
+            var email = document.getElementById("inputEmail").value
+            var pwd = document.getElementById("inputPassword").value
+            var check = document.getElementsByName("inlineRadioOptions")
+            var len = check.length
+            var role;
+            for (var i = 0; i < len; i++) {
+                if (check[i].checked == true) {
+                    role = check[i].value
+                    break;
+                }
+            }
+            validate(email, pwd, role)
+        }
+
+        //validates the creadentails and
+        function validate(email, pwd, role) {
+            var data;
+            if (role == "admin") {
+                if (adminsData[email] == pwd) {
+                    redirectAdmin(email);
+                    location = "companyDashboard.html"
+                }
+                else if (adminsData[email] == undefined) {
+                    document.getElementById("validationMsg").innerText = "invalid mail address"
+                }
+                else if (adminsData[email] != pwd) {
+                    document.getElementById("validationMsg").innerText = "wrong password"
+                }
+            }
+            else {
+                if (usersData[email] == pwd) {
+                    redirectUser(email)
+                }
+                else if (usersData[email] == undefined) {
+                    document.getElementById("validationMsg").innerText = "invalid mail address"
+                }
+                else if (usersData[email] != pwd) {
+                    document.getElementById("validationMsg").innerText = "wrong password"
+                }
+            }
+        }
+
+        //stores active admin and redirects to companyDashboard
+        function redirectAdmin(email){
+            localStorage.setItem("active",JSON.stringify({"admin":email}))
+            location = "userDashboard.html"
+        }
+
+        //stores active user and redirects to userDashboard
+        function redirectUser(email){
+            localStorage.setItem("active",JSON.stringify({"user":email}))
+            location = "userDashboard.html"
+        }
+
+    </script>
+</body>
+
+</html>

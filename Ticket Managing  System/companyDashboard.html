@@ -1,0 +1,27 @@
+<html>
+
+<head>
+    <title>Company Dashborard</title>
+</head>
+
+<body>
+    <p>Company Dash Board</p>
+    <button id="logout">Logout</button>
+</body>
+<script>
+    var active = localStorage.getItem("active")
+    if(active == undefined || JSON.parse(active)["admin"] == undefined){
+        alert("invalid access , logging out...")
+        localStorage.removeItem("active")
+        location = "login.html"
+    }
+    var btn = document.getElementById("logout")
+    btn.addEventListener("click",logout)
+
+    function logout(){
+    localStorage.removeItem("active") 
+    location = "login.html"
+    }
+    
+</script>
+</html>
