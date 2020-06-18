@@ -4,26 +4,277 @@
     <title>
         User Dashboard
     </title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
+        integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+    <style>
+        .box {
+            border: 1px solid red;
+        }
+    </style>
 </head>
 
 <body>
-    <p>User Dash Board</p>
-    <button id="logout">Logout</button>
+    <div class="h1 text-dark text-center mt-5 mb-5">User Dash Board</div>
+    <div class="container-fluid">
+        <nav class="navbar navbar-expand-lg navbar-light bg-light ">
+            <a class="navbar-brand" href="#">Company</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" id="addNewTicket">Add Tickets</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" id="viewAllTickets">My Tickets</a>
+                    </li>
+
+                    <li class="nav-item ml-5">
+                        <a class="nav-link" href="#" id="logout">Logout</a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+    </div>
+
+    <div class="container" id="ticketSection">
+    </div>
+    <div class="container d-none" id="ticketInputSection">
+        <div class="w-50 mt-5">
+            <form>
+                <div class="form-group">
+                    <label for="subject">Ticket Subject</label>
+                    <input type="text" class="form-control" id="subject" placeholder="Laptop Charger Replacement"
+                        required="required">
+                </div>
+                <div class="form-group">
+                    <label for="catogery">Ticket Catogery</label>
+                    <select class="form-control" id="catogery">
+                        <option>Project Related</option>
+                        <option>It requirements</option>
+                        <option>Leave</option>
+                        <option>Mixed</option>
+                        <option>None of the above</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="description">Ticket Description</label>
+                    <textarea class="form-control" id="description" rows="3"></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary mb-2 btn-block" id="addTicket">Add Ticket</button>
+            </form>
+        </div>
+    </div>
+    <script>
+        var active = localStorage.getItem("active")
+        console.log("in script------")
+        if (active == undefined || JSON.parse(active)["user"] == undefined) {
+            alert("invalid access , logging out...")
+            localStorage.removeItem("active")
+            location = "login.html"
+        }
+
+        var btn = document.getElementById("logout")
+        btn.addEventListener("click", logout)
+
+        function logout() {
+            localStorage.removeItem("active")
+            location = "login.html"
+        }
+
+        var addNewTicket = document.getElementById("addNewTicket")
+        addNewTicket.addEventListener("click", function (e) {
+            console.log("in add new ticket fucntion")
+            processAddTicket();
+        })
+
+        var viewAllTickets = document.getElementById("viewAllTickets")
+        viewAllTickets.addEventListener("click", processviewAllTickets)
+
+        function processAddTicket() {
+            console.log("in process add  ticket fucntion")
+            createNewTicket()
+        }
+
+        function createNewTicket() {
+            console.log("in create new ticket function")
+            document.getElementById("ticketSection").style.display = "none"
+            document.getElementById("ticketInputSection").setAttribute("class", "container")
+            document.getElementById("ticketInputSection").style.display = "block"
+            document.getElementById("addTicket").addEventListener("click", process)
+        }
+
+        function process() {
+            console.log("in create new ticket")
+            var data = getTicketInput()
+            console.log("after calling getInput")
+            var result = submitTicket(data)
+            console.log("after calling submit")
+            viewAddedTicket(result)
+            console.log("after calling view added ticket")
+            alert("Ticket Added")
+        }
+        function getTicketInput() {
+            console.log("in get input function")
+            var data = {}
+            data["subject"] = document.getElementById("subject").value
+            data["catogery"] = document.getElementById("catogery").value
+            data["description"] = [[JSON.parse(active)["user"], document.getElementById("description").value]]
+            data["creator"] = JSON.parse(active)["user"]
+            console.log(data)
+            return data
+        }
+
+        function submitTicket(result) {
+            console.log("in submit ticket function")
+
+            var data = JSON.parse(localStorage.getItem("tickets"))
+            var id = data.length
+            result["id"] = id
+            result["status"] = "pending"
+            console.log("before pushing result data is", data)
+            console.log("result is ", result)
+            if (data.length == 0) {
+                data[0] = result
+            }
+            else {
+                data[data.length] = result;
+            }
+            console.log("after pushing result data is", data)
+            localStorage.setItem("tickets", JSON.stringify(data))
+            console.log("in submit ticket", result)
+            return result
+        }
+
+        function viewAddedTicket(ticket) {
+            console.log("in viewaddedticket function ", ticket)
+            document.getElementById("ticketInputSection").setAttribute("class", "container d-none")
+            document.getElementById("ticketSection").style.display = "all"
+            var p = document.createElement("p")
+            p.innerText = "Ticket Added"
+            document.getElementById("ticketSection").appendChild(p)
+        }
+
+        function processviewAllTickets(e) {
+            document.querySelector("#ticketSection").innerHTML = ""
+            console.log("in view all tickets function")
+            console.log(document.getElementById("ticketSection"))
+            document.getElementById("ticketSection").style.display = "block"
+            document.getElementById("ticketInputSection").style.display = "none"
+            var data = JSON.parse(localStorage.getItem("tickets"))
+            var len = data.length
+            console.log("length is",len)
+
+
+
+            for (var i = 0; i < len; i++) {
+                console.log(data[i])
+                var div = document.createElement("div")
+                div.setAttribute("class", "border p-5")
+                var op = ""
+
+                for (key in data[i]) {  
+                    console.log(key,data[i][key])  
+                        if(key == "id") {
+                            op += "<div class = \"key  ml-5 text-left " + key + "\" id =\""+data[i][key]+"\">" + key + " : " + "<span class=\"value \" >" + data[i][key] + "</span>" + "</div>"  
+                            continue
+                        }             
+                        else if (key == "status") {
+                            if (data[i][key] == "pending")
+                                op += "<div class = \"key  ml-5  text-left " + key + "\">" + key + " : " + "<span class=\"value text-danger\" >" + data[i][key] + "</span>" + "</div>"
+                            else
+                                op += "<div class = \"key  ml-5 text-left " + key + "\">" + key + " : " + "<span class=\"value text-success\" >" + data[i][key] + "</span>" + "</div>"
+                            continue
+                        }
+                        else if(key == "description"){
+                            op += "<div class = \"key  ml-5  text-left " + key + "\">" + key + " : "
+                            var tot = data[i][key].length
+                            for(var j =0;j<tot;j++){
+                                op +=  "<br><span class=\"value ml-5\" >" + data[i][key][j] + "</span>"
+                            }
+                            op += "</div>"
+                            continue                            
+                        }
+                        else{
+                         op += "<div class = \"key  ml-5 text-left " + key + "\">" + key + " : " + "<span class=\"value \" >" + data[i][key] + "</span>" + "</div>"
+                        }
+                }
+                op += "<br>"    
+                var innerDiv = document.createElement("div")
+                innerDiv.innerHTML = op
+                console.log(innerDiv)
+                innerDiv.setAttribute("class","shadow-lg")
+                innerDiv.addEventListener("click",function(e){processSelectedTicket(e)})
+                div.appendChild(innerDiv)
+                document.getElementById("ticketSection").appendChild(div)
+                }
+        }
+
+        function processSelectedTicket(e,data){
+            if(e == null) {
+                e.currentTarget = data
+            }
+            console.log(e.currentTarget)
+            var currentTarget = e.currentTarget
+            e.currentTarget.setAttribute("id","currentEdit")
+            var ticketSection = document.getElementById("ticketSection")
+            ticketSection.innerHTML = ""
+            var textarea = document.createElement("textarea")
+            textarea.setAttribute("id","updateDesc")
+            textarea.setAttribute("placeholder","Add Description to update")
+            textarea.setAttribute("class","mt-5 mb-5 d-block")
+            var btn = document.createElement("button")
+            btn.setAttribute("class","btn btn-lg btn-primary")
+            btn.innerText = "Add Description"
+            btn.addEventListener("click",function(){
+                addDescription(currentTarget)
+                })
+            ticketSection.append(e.currentTarget,textarea,btn)
+        }
+        function addDescription(currentTarget){
+            var newDesc = document.getElementById("updateDesc").value
+            var tempEle = document.querySelector("#currentEdit > .id")
+            var tempEleId = document.querySelector("#currentEdit > .id > .value")
+            console.log(tempEle,tempEleId)
+            var id = Number(tempEleId.innerText)
+            console.log("new update id is"+id)
+            console.log("new update desc ",newDesc)
+            var ticket = getTicketByID(id)
+            ticket["description"].push([JSON.parse(active)["user"],newDesc]) 
+            var ticket = updateTicketById(id,ticket)
+        }
+        
+        function getTicketByID(id){
+            console.log("in get ticket by id function")
+
+            var tickets = JSON.parse(localStorage.getItem("tickets"))
+            var len = tickets.length
+            for(var i=0;i<len;i++){
+                if(Number(tickets[i]["id"]) == id){
+                    return tickets[i]
+                }
+            }
+        }
+        function updateTicketById(id,ticket){
+            console.log("in update ticket function")
+            console.log(ticket)
+            var tickets = JSON.parse(localStorage.getItem("tickets"))
+            var len = tickets.length
+            for(var i=0;i<len;i++){
+                if(Number(tickets[i]["id"]) == id){
+                    console.log("updating")
+                     tickets[i] =  ticket
+                     localStorage.setItem("tickets",JSON.stringify(tickets))   
+                    alert("ticket updated")
+                    location = "userDashboard.html"
+                    return
+                }
+            }
+        }
+
+    </script>
 </body>
-<script>
-    var active = localStorage.getItem("active")
-    if(active == undefined || JSON.parse(active)["user"] == undefined){
-        alert("invalid access , logging out...")
-        localStorage.removeItem("active")
-        location = "login.html"
-    }
 
-    var btn = document.getElementById("logout")
-    btn.addEventListener("click",logout)
-
-    function logout(){
-    localStorage.removeItem("active") 
-    location = "login.html"
-    }    
-</script>
 </html>

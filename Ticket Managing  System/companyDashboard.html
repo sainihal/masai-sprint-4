@@ -2,26 +2,32 @@
 
 <head>
     <title>Company Dashborard</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
+        integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
 </head>
 
 <body>
-    <p>Company Dash Board</p>
-    <button id="logout">Logout</button>
+    <div class="h1">Company Dash Board</div>
+
+    <div class=container>
+        <button id="logout">Logout</button>
+    </div>
 </body>
 <script>
     var active = localStorage.getItem("active")
-    if(active == undefined || JSON.parse(active)["admin"] == undefined){
+    if (active == undefined || JSON.parse(active)["admin"] == undefined) {
         alert("invalid access , logging out...")
         localStorage.removeItem("active")
         location = "login.html"
     }
     var btn = document.getElementById("logout")
-    btn.addEventListener("click",logout)
+    btn.addEventListener("click", logout)
 
-    function logout(){
-    localStorage.removeItem("active") 
-    location = "login.html"
+    function logout() {
+        localStorage.removeItem("active")
+        location = "login.html"
     }
-    
+
 </script>
+
 </html>
